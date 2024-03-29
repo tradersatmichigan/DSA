@@ -2,6 +2,19 @@
 #include <iostream>
 #include <vector>
 
+/*    Helper class to allow for intuitive access to the array
+  *   
+  *   Instead of: 
+  *     decomposition.update(index, value)
+  *   We can now do: 
+  *     decomposition[index] = value
+  *
+  *   We can also use the operator like it returns the value at an index 
+  *   Thanks to the over load of operator int() 
+  *   ie : 
+  *     int result = decomposition[5] + 6;
+  *
+  */
 class paired_int {
   int& base;
   int& derivative;
@@ -14,6 +27,8 @@ public:
     derivative += dif;
     base += dif;
   }
+
+  operator int() const { return base; }
 };
 
 class decomposition {
@@ -22,6 +37,11 @@ class decomposition {
   int n;
 
 public:
+  /*    Note the &&. This is an Rvalue.
+   *    Essencially this means we "move" the vector 
+   *    instead of making a copy of it, making this 
+   *    much more efficient
+   */   
   decomposition(std::vector<int>&& _data) {
     data = _data;
     compressed = std::vector<int>(n);
@@ -61,6 +81,9 @@ public:
   }
 };
 
+/*
+*   Helper test function to allow for a minimal testing suite
+*/
 void test(int l, int r, decomposition& d, int expected) {
   static int test_num = 1;
   int res = d.query(l, r);
@@ -73,6 +96,10 @@ void test(int l, int r, decomposition& d, int expected) {
   ++test_num;
 }
 
+/*
+*   A very small and non-comprehensive test suite to 
+*   demonstrate usage of the decomposition class
+*/
 int main() {
   std::vector<int> v = {1, 2, 3, 4, 5};
   decomposition d(std::move(v));
@@ -81,7 +108,8 @@ int main() {
   test(1, 5, d, 14);
   test(0, 3, d, 10);
 
-  d[2] = 10; // {1, 2, 10, 4, 5}
+  d[2] = 10;
+  // d = {1, 2, 10, 4, 5}
 
   test(0, 5, d, 22);
   test(1, 5, d, 21);
