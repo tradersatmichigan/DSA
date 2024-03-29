@@ -2,6 +2,20 @@
 #include <iostream>
 #include <vector>
 
+class paired_int {
+  int& base;
+  int& derivative;
+
+public:
+  paired_int(int& _base, int& _der) : derivative(_der), base(_base) {};
+
+  void operator=(int val) {
+    int dif = val - base;
+    derivative += dif;
+    base += dif;
+  }
+};
+
 class decomposition {
   std::vector<int> data;
   std::vector<int> compressed;
@@ -42,11 +56,8 @@ public:
     return result;
   }
 
-  void update(int index, int value) {
-    int dif = value - data[index];
-    int b = index / n;
-    compressed[b] += dif;
-    data[index] += dif;
+  paired_int operator[](int i) {
+    return paired_int(data[i], compressed[i / n]);
   }
 };
 
@@ -70,7 +81,7 @@ int main() {
   test(1, 5, d, 14);
   test(0, 3, d, 10);
 
-  d.update(2, 10); // {1, 2, 10, 4, 5}
+  d[2] = 10; // {1, 2, 10, 4, 5}
 
   test(0, 5, d, 22);
   test(1, 5, d, 21);
