@@ -108,10 +108,14 @@ int main() {
   test(1, 5, d, 14);
   test(0, 3, d, 10);
 
-  d[2] = 10;
   // d = {1, 2, 10, 4, 5}
+  d[2] = 10;
 
   test(0, 5, d, 22);
   test(1, 5, d, 21);
   test(3, 5, d, 9);
+
+  // i = 10; indexable as a normal vector
+  int i = d[2];
+  std::cout << "d[2] = " << i << '\n';
 }
