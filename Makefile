@@ -1,5 +1,5 @@
 CXX = g++
-STD = -std=c++11
+STD = -std=c++14
 BIN = bin/out
 
 % : src/%.cpp
