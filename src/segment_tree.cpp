@@ -16,18 +16,23 @@ int nextPower2(int size) {
 
 class segmentTree {
  vector<int> tree;
-  const int n;
+  const int width;
+
+  static int leftChild(int node) { return 2 * node; }
+  static int rightChild(int node) { return 2 * node + 1; }
+  static int parentNode(int node) { return node / 2; }
 
   int _query(int root, int start, int end, int queryStart, int queryEnd) const {
     if (start > queryEnd || end < queryStart) return 0;
     else if (start >= queryStart && end <= queryEnd) return tree[root]; 
     int elementsPerChild = (end - start) / 2;
-    return _query(root * 2, start, start + elementsPerChild, queryStart, queryEnd) + 
-           _query(root * 2 + 1, end - elementsPerChild, end, queryStart, queryEnd);
+    return _query(leftChild(root), start, start + elementsPerChild, queryStart, queryEnd) + 
+           _query(rightChild(root), end - elementsPerChild, end, queryStart, queryEnd);
   }
+
+
 public:
-  segmentTree(vector<int>& data) : n(data.size()) {
-    int width = nextPower2(data.size());
+  segmentTree(vector<int>& data) : width(nextPower2(data.size())) {
     int size = 2 * width;
     tree.resize(size);
 
@@ -38,12 +43,21 @@ public:
     }
     // consolidate the numbers into sums
     for (int node = tree.size() / 2; node > 0; --node) {
-      tree[node] = tree[2 * node] + tree[2 * node + 1];
+      tree[node] = tree[leftChild(node)] + tree[rightChild(node)];
     }
   }
 
   int query(int l, int r) {
-    return _query(1, 0, tree.size()/2, l, r);
+    return _query(1, 0, width, l, r);
+  }
+
+  void updateElt(int index, int newValue) {
+    index += width;
+    int delta = newValue - tree[index];
+    while (index > 0) {
+      tree[index] += delta;
+      index = parentNode(index);
+    }
   }
 };
 
@@ -64,6 +78,15 @@ void test(segmentTree & st, vector<int> &data, int l, int r) {
 int main() {
   vector<int> data = {0, 1, 2, 3, 4, 5, 6};
   segmentTree st(data);
+
+  test(st, data, 0, 7);
+  test(st, data, 3, 5);
+  test(st, data, 2, 6);
+  test(st, data, 1, 4);
+
+  st.updateElt(1, 10);
+  // syncing the vector to match the segment tree
+  data[1] = 10;
 
   test(st, data, 0, 7);
   test(st, data, 3, 5);
