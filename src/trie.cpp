@@ -1,3 +1,4 @@
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -23,3 +24,12 @@ public:
   }
   
 };
+
+int main() {
+  trie t;
+
+  t["myKey"] = 5;
+  std::cout << "Retreiving a value by key : " << t["myKey"] << '\n';
+
+  std::cout << "Accessing a key that hasn't been set : " << t["undefinedKey"] << '\n';
+}
