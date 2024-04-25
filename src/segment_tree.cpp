@@ -7,14 +7,14 @@ using std::vector;
 /*
 * Return the next power of 2 that is at least as great as the input
 */
-int nextPower2(int size) {
+int next_power2(int size) {
   int power = 1;
   while (power < size)
     power <<= 1;
   return power;
 }
 
-class segmentTree {
+class segment_tree {
  vector<int> tree;
   const int width;
 
@@ -32,7 +32,7 @@ class segmentTree {
 
 
 public:
-  segmentTree(vector<int>& data) : width(nextPower2(data.size())) {
+  segment_tree(vector<int>& data) : width(next_power2(data.size())) {
     int size = 2 * width;
     tree.resize(size);
 
@@ -51,7 +51,7 @@ public:
     return _query(1, 0, width, l, r);
   }
 
-  void updateElt(int index, int newValue) {
+  void update_elt(int index, int newValue) {
     index += width;
     int delta = newValue - tree[index];
     while (index > 0) {
@@ -61,7 +61,7 @@ public:
   }
 };
 
-void test(segmentTree & st, vector<int> &data, int l, int r) {
+void test(segment_tree & st, vector<int> &data, int l, int r) {
   static int testNum = 1;
   int actual = std::accumulate(data.begin() + l, data.begin() + r, 0);
   int observed = st.query(l, r);
@@ -77,14 +77,14 @@ void test(segmentTree & st, vector<int> &data, int l, int r) {
 
 int main() {
   vector<int> data = {0, 1, 2, 3, 4, 5, 6};
-  segmentTree st(data);
+  segment_tree st(data);
 
   test(st, data, 0, 7);
   test(st, data, 3, 5);
   test(st, data, 2, 6);
   test(st, data, 1, 4);
 
-  st.updateElt(1, 10);
+  st.update_elt(1, 10);
   // syncing the vector to match the segment tree
   data[1] = 10;
 
