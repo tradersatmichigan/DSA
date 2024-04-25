@@ -42,7 +42,7 @@ public:
       *treePtr = *dataPtr;
     }
     // consolidate the numbers into sums
-    for (int node = tree.size() / 2; node > 0; --node) {
+    for (int node = width; node > 0; --node) {
       tree[node] = tree[leftChild(node)] + tree[rightChild(node)];
     }
   }
