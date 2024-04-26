@@ -1,27 +1,27 @@
 #include <cassert>
 #include <iostream>
-template<unsigned int size, typename T = unsigned int>
+template<class S, S size, typename T = unsigned int>
 class bit_set {
 
   T set[size / sizeof(T) + (bool) (size % sizeof(T))];
 
 public:
-
-  void add(unsigned int key) {
-    unsigned int index = key / sizeof(T);
-    unsigned int offset = key % sizeof(T);
-    set[index] |= (1 << offset);
+  
+  void add(S key) {
+    S index = key / sizeof(T);
+    S offset = key % sizeof(T);
+    set[index] |= ((T)1 << offset);
   }
 
-  bool contains(unsigned int key) {
-    unsigned int index = key / sizeof(T);
-    unsigned int offset = key % sizeof(T);
-    return set[index] & (1 << offset);
+  bool contains(S key) {
+    S index = key / sizeof(T);
+    S offset = key % sizeof(T);
+    return set[index] & ((T)1 << offset);
   }
 };
 
 int main () {
-  bit_set<100> bs;
+  bit_set<int, 100> bs;
 
   assert(!bs.contains(1));
 
