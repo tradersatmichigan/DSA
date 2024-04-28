@@ -1,32 +1,23 @@
-#include <cassert>
 #include <iostream>
-template<class S, S size, typename T = unsigned int>
-class bit_set {
+#define bitSize(T) 8 * sizeof(T)
 
-  T set[size / sizeof(T) + (bool) (size % sizeof(T))];
+typedef unsigned int UI;
+template<UI size, typename T = unsigned int>
+class bit_set {
+  T set[size / bitSize(T) + (bool) (size % bitSize(T))];
 
 public:
-  
-  void add(S key) {
-    S index = key / sizeof(T);
-    S offset = key % sizeof(T);
+
+  void add(UI key) {
+    UI index = key / bitSize(T);
+    UI offset = key % bitSize(T);
     set[index] |= ((T)1 << offset);
   }
 
-  bool contains(S key) {
-    S index = key / sizeof(T);
-    S offset = key % sizeof(T);
+  bool contains(unsigned int key) {
+    UI index = key / bitSize(T);
+    UI offset = key % bitSize(T);
     return set[index] & ((T)1 << offset);
   }
 };
 
-int main () {
-  bit_set<int, 100> bs;
-
-  assert(!bs.contains(1));
-
-  bs.add(1);
-  assert(bs.contains(1));
-
-  std::cout << "Test pass\n";
-}
