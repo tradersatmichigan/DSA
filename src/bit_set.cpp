@@ -21,3 +21,9 @@ public:
   }
 };
 
+int main() {
+  bit_set<1000> bs;
+
+  bs.add(3);
+  bs.contains(3);
+}
