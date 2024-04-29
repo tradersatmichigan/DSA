@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
 /*    Helper class to allow for intuitive access to the array
@@ -31,6 +32,17 @@ public:
   operator int() const { return base; }
 };
 
+/*
+ * Main class implementation that is constructed by moving a vector ie:
+ * vector<int> v = {1, 2, 3, 4};
+ * decomposition d(std::move(v));
+ *
+ * Allows for O(sqrt(n)) sum queries and O(1) update time ie:
+ *
+ * int res = d.query(1, 5); // return the sum of indicies 1 - 5 (inclusive)
+ * d[2] = 10; // update the value of index 2 to 10
+ *
+ */
 class decomposition {
   std::vector<int> data;
   std::vector<int> compressed;
@@ -44,34 +56,33 @@ public:
    */   
   decomposition(std::vector<int>&& _data) {
     data = _data;
-    compressed = std::vector<int>(n);
     n = std::ceil(std::sqrt(data.size()));
+    compressed.resize(n);
 
-    for (int b = 0; b < n; ++b) {
-      for (int o = 0; o < n; ++o) {
-        int i = b * n + o;
-        if (i < data.size()) compressed[b] += data[i];
+    for (int block = 0; block < n; ++block) {
+      for (int offset = 0; offset < n; ++offset) {
+        int index = block * n + offset;
+        if (index < data.size()) compressed[block] += data[index];
       }
     }
   };
 
   int query(int l, int r) {
-    int sb = l / n;
-    int so = l - n * sb;
+    int start_block = l / n;
+    int start_offset = l - n * start_block;
 
-    int eb = r / n; 
-    int eo = r - eb * n;
+    int end_block = r / n; 
+    int end_offset = r - end_block * n;
 
     int result {0};
 
-    for (int i = sb; i <= eb; ++i) result += compressed[i];
+    for (int i = start_block; i <= end_block; ++i) result += compressed[i];
 
     // subtract head 
-    for (int i = 0; i < so; ++i) result -= data[sb * n + i];
+    for (int i = 0; i < start_offset; ++i) result -= data[start_block * n + i];
+
     // subtract tail
-    int s_end = eb * n + eo + 1;
-    int b_end = std::min(eb * n + n, (int)data.size());
-    for (; s_end < b_end; ++s_end) result -= data[s_end];
+    for (int i = end_offset + 1; (i < n) && (data.size() > end_block * n + i); ++i) result -= data[end_block * n + i];
 
     return result;
   }
@@ -84,9 +95,10 @@ public:
 /*
 *   Helper test function to allow for a minimal testing suite
 */
-void test(int l, int r, decomposition& d, int expected) {
+void test(int l, int r, decomposition& d, std::vector<int> &v) {
   static int test_num = 1;
   int res = d.query(l, r);
+  int expected = std::accumulate(v.begin() + l, v.begin() + r + 1, 0);
   if (expected != res) {
     std::cout << "TEST " << test_num << " FAILED: expected " << expected << " but got " << res << '\n';
   }
@@ -101,19 +113,21 @@ void test(int l, int r, decomposition& d, int expected) {
 *   demonstrate usage of the decomposition class
 */
 int main() {
-  std::vector<int> v = {1, 2, 3, 4, 5};
-  decomposition d(std::move(v));
+  std::vector<int> temp = {10, 1, 4, 100, 23, 5, -1, 5, 97, 52};
+  std::vector<int> v = temp;
+  decomposition d(std::move(temp));
   
-  test(0, 5, d, 15);
-  test(1, 5, d, 14);
-  test(0, 3, d, 10);
+  test(0, 5, d, v);
+  test(1, 5, d, v);
+  test(0, 3, d, v);
 
-  // d = {1, 2, 10, 4, 5}
+  // Changing V so that the test function can calculate the sum correctly
   d[2] = 10;
+  v[2] = 10;
 
-  test(0, 5, d, 22);
-  test(1, 5, d, 21);
-  test(3, 5, d, 9);
+  test(0, 5, d, v);
+  test(1, 5, d, v);
+  test(3, 5, d, v);
 
   // i = 10; indexable as a normal vector
   int i = d[2];
