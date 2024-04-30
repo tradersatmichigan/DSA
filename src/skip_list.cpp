@@ -85,6 +85,10 @@ public:
       printf("\n");
     }
   }
+
+  ~skip_list() {
+    if (next[0]) delete next[0];
+  }
 };
 
 int main () {
