@@ -1,4 +1,3 @@
-#include <cmath>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -15,7 +14,7 @@ int next_power2(int size) {
 }
 
 class segment_tree {
- vector<int> tree;
+  vector<int> tree;
   const int width;
 
   static int leftChild(int node) { return 2 * node; }
@@ -23,22 +22,26 @@ class segment_tree {
   static int parentNode(int node) { return node / 2; }
 
   int _query(int root, int start, int end, int queryStart, int queryEnd) const {
-    if (start > queryEnd || end < queryStart) return 0;
-    else if (start >= queryStart && end <= queryEnd) return tree[root]; 
+    if (start > queryEnd || end < queryStart)
+      return 0;
+    else if (start >= queryStart && end <= queryEnd)
+      return tree[root];
     int elementsPerChild = (end - start) / 2;
-    return _query(leftChild(root), start, start + elementsPerChild, queryStart, queryEnd) + 
-           _query(rightChild(root), end - elementsPerChild, end, queryStart, queryEnd);
+    return _query(leftChild(root), start, start + elementsPerChild, queryStart,
+                  queryEnd) +
+           _query(rightChild(root), end - elementsPerChild, end, queryStart,
+                  queryEnd);
   }
 
-
-public:
+ public:
   segment_tree(vector<int>& data) : width(next_power2(data.size())) {
     int size = 2 * width;
     tree.resize(size);
 
     // load in the base data
     auto treePtr = tree.begin() + width;
-    for (auto dataPtr = data.begin(); dataPtr != data.end(); ++dataPtr, ++treePtr) {
+    for (auto dataPtr = data.begin(); dataPtr != data.end();
+         ++dataPtr, ++treePtr) {
       *treePtr = *dataPtr;
     }
     // consolidate the numbers into sums
@@ -47,9 +50,7 @@ public:
     }
   }
 
-  int query(int l, int r) {
-    return _query(1, 0, width, l, r);
-  }
+  int query(int l, int r) { return _query(1, 0, width, l, r); }
 
   void update_elt(int index, int newValue) {
     index += width;
@@ -61,15 +62,14 @@ public:
   }
 };
 
-void test(segment_tree & st, vector<int> &data, int l, int r) {
+void test(segment_tree& st, vector<int>& data, int l, int r) {
   static int testNum = 1;
   int actual = std::accumulate(data.begin() + l, data.begin() + r, 0);
   int observed = st.query(l, r);
   if (actual == observed) {
     std::cout << "Test num " << testNum << " passed\n";
-  }
-  else {
-    std::cout << "FAILED TEST " << testNum << '\n'; 
+  } else {
+    std::cout << "FAILED TEST " << testNum << '\n';
     std::cout << "EXPECTED: " << actual << " GOT: " << observed << '\n';
   }
   ++testNum;

@@ -4,9 +4,8 @@ struct factorial {
   enum { value = i * factorial<i - 1>::value };
 };
 
-template<>
-struct factorial<0>
-{
+template <>
+struct factorial<0> {
   enum { value = 0 };
 };
 

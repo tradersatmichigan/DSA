@@ -4,15 +4,15 @@
 #include <vector>
 
 /*    Helper class to allow for intuitive access to the array
-  *   
-  *   Instead of: 
+  *
+  *   Instead of:
   *     decomposition.update(index, value)
-  *   We can now do: 
+  *   We can now do:
   *     decomposition[index] = value
   *
-  *   We can also use the operator like it returns the value at an index 
-  *   Thanks to the over load of operator int() 
-  *   ie : 
+  *   We can also use the operator like it returns the value at an index
+  *   Thanks to the over load of operator int()
+  *   ie :
   *     int result = decomposition[5] + 6;
   *
   */
@@ -20,8 +20,8 @@ class paired_int {
   int& base;
   int& derivative;
 
-public:
-  paired_int(int& _base, int& _der) : derivative(_der), base(_base) {};
+ public:
+  paired_int(int& _base, int& _der) : derivative(_der), base(_base){};
 
   void operator=(int val) {
     int dif = val - base;
@@ -48,12 +48,12 @@ class decomposition {
   std::vector<int> compressed;
   int n;
 
-public:
+ public:
   /*    Note the &&. This is an Rvalue.
-   *    Essencially this means we "move" the vector 
-   *    instead of making a copy of it, making this 
+   *    Essencially this means we "move" the vector
+   *    instead of making a copy of it, making this
    *    much more efficient
-   */   
+   */
   decomposition(std::vector<int>&& _data) {
     data = _data;
     n = std::ceil(std::sqrt(data.size()));
@@ -62,7 +62,8 @@ public:
     for (int block = 0; block < n; ++block) {
       for (int offset = 0; offset < n; ++offset) {
         int index = block * n + offset;
-        if (index < data.size()) compressed[block] += data[index];
+        if (index < data.size())
+          compressed[block] += data[index];
       }
     }
   };
@@ -71,18 +72,22 @@ public:
     int start_block = l / n;
     int start_offset = l - n * start_block;
 
-    int end_block = r / n; 
+    int end_block = r / n;
     int end_offset = r - end_block * n;
 
-    int result {0};
+    int result{0};
 
-    for (int i = start_block; i <= end_block; ++i) result += compressed[i];
+    for (int i = start_block; i <= end_block; ++i)
+      result += compressed[i];
 
-    // subtract head 
-    for (int i = 0; i < start_offset; ++i) result -= data[start_block * n + i];
+    // subtract head
+    for (int i = 0; i < start_offset; ++i)
+      result -= data[start_block * n + i];
 
     // subtract tail
-    for (int i = end_offset + 1; (i < n) && (data.size() > end_block * n + i); ++i) result -= data[end_block * n + i];
+    for (int i = end_offset + 1; (i < n) && (data.size() > end_block * n + i);
+         ++i)
+      result -= data[end_block * n + i];
 
     return result;
   }
@@ -95,28 +100,28 @@ public:
 /*
 *   Helper test function to allow for a minimal testing suite
 */
-void test(int l, int r, decomposition& d, std::vector<int> &v) {
+void test(int l, int r, decomposition& d, std::vector<int>& v) {
   static int test_num = 1;
   int res = d.query(l, r);
   int expected = std::accumulate(v.begin() + l, v.begin() + r + 1, 0);
   if (expected != res) {
-    std::cout << "TEST " << test_num << " FAILED: expected " << expected << " but got " << res << '\n';
-  }
-  else {
+    std::cout << "TEST " << test_num << " FAILED: expected " << expected
+              << " but got " << res << '\n';
+  } else {
     std::cout << "test " << test_num << " passed\n";
   }
   ++test_num;
 }
 
 /*
-*   A very small and non-comprehensive test suite to 
+*   A very small and non-comprehensive test suite to
 *   demonstrate usage of the decomposition class
 */
 int main() {
   std::vector<int> temp = {10, 1, 4, 100, 23, 5, -1, 5, 97, 52};
   std::vector<int> v = temp;
   decomposition d(std::move(temp));
-  
+
   test(0, 5, d, v);
   test(1, 5, d, v);
   test(0, 3, d, v);
