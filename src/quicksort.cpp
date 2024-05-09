@@ -2,6 +2,10 @@
 #include <vector>
 using std::vector;
 
+enum pivot_selector {
+  firstElement
+};
+
 template<class T, int i>
 struct Wrapper {
   static T get_pivot(T begin, T end) {
@@ -10,7 +14,7 @@ struct Wrapper {
 };
 
 template<class T>
-struct Wrapper<T, 1> {
+struct Wrapper<T, firstElement> {
   static T get_pivot(T begin, T end) {
     return begin;
   }
@@ -42,7 +46,7 @@ void quick_sort(T begin, T end) {
 
 int main() {
   vector<int> v = {4, 1, 3, 35, 324, 2, -1};
-  quick_sort<1>(v.begin(), v.end());
+  quick_sort<firstElement>(v.begin(), v.end());
 
   printf("{ ");
   for (const auto num : v) printf("%d, ", num);
