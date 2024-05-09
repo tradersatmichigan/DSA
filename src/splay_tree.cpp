@@ -1,10 +1,12 @@
 #include <cassert>
 #include <functional>
 #include <iostream>
+#include <string>
 #include <vector>
 
 using std::cout;
 using std::endl;
+using std::string;
 using std::vector;
 
 template <typename T, typename Comp = std::less<T>>
@@ -230,21 +232,21 @@ class splay_tree {
 
   const T& root_val() const { return root->val; }
 
-  void print() { print("", root, false); }
+  void print() { print("", root, false, true); }
 
-  void print(const std::string& prefix, const node* node, bool isLeft) {
-    if (node != nullptr) {
-      cout << prefix;
+  void print(const string& prefix, node* parent, bool isLeft, bool isRoot) {
+    if (parent == nullptr)
+      return;
 
-      cout << (isLeft ? "├──" : "└──");
-
-      // print the value of the node
-      cout << node->val << endl;
-
-      // enter the next tree level - left and right branch
-      print(prefix + (isLeft ? "│  " : "   "), node->left, true);
-      print(prefix + (isLeft ? "│  " : "   "), node->right, false);
+    if (isRoot) {
+      cout << "─────";
+    } else {
+      cout << prefix << (isLeft ? "L├────" : "R└───");
     }
+    cout << parent->val << endl;
+
+    print(prefix + (isLeft ? " │   " : "    "), parent->left, true, false);
+    print(prefix + (isLeft ? " │   " : "    "), parent->right, false, false);
   }
 };
 
