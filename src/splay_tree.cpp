@@ -1,6 +1,11 @@
+#include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <functional>
+#include <iomanip>
 #include <iostream>
+#include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -250,7 +255,7 @@ class splay_tree {
   }
 };
 
-int main() {
+void simple_test() {
   vector<int> data = {0, 1, 2, 3, 4, 5, 6};
   splay_tree<int> tree(data.begin(), data.end());
   cout << "Initial tree:" << endl;
@@ -267,4 +272,31 @@ int main() {
   cout << "Insert 7:" << endl;
   tree.insert(7);
   tree.print();
+}
+
+void timed_test() {
+  vector<int> data(10000000);
+  iota(data.begin(), data.end(), 1);
+  std::random_device rd;
+  std::mt19937 g(rd());
+  shuffle(data.begin(), data.end(), g);
+  splay_tree<int> tree(data.begin(), data.end());
+
+  std::clock_t c_start = std::clock();
+  assert(tree.contains(500000));
+  std::clock_t c_end = std::clock();
+
+  std::cout << "First search: " << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC
+            << "ms\n";
+
+  c_start = std::clock();
+  assert(tree.contains(500000));
+  c_end = std::clock();
+
+  std::cout << "Second search: " << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC
+            << "ms\n";
+}
+
+int main() {
+  timed_test();
 }
