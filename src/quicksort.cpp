@@ -1,22 +1,33 @@
+#include <algorithm>
+#include <iostream>
 #include <utility>
 #include <vector>
 using std::vector;
 
 enum pivot_selector {
-  firstElement
+  First,
+  Random
 };
 
 template<class T, int i>
 struct Wrapper {
   static T get_pivot(T begin, T end) {
-
+    // overloaded for specific types
   }
 };
 
 template<class T>
-struct Wrapper<T, firstElement> {
+struct Wrapper<T, First> {
   static T get_pivot(T begin, T end) {
     return begin;
+  }
+};
+
+template<class T>
+struct Wrapper<T, Random> {
+  static T get_pivot(T begin, T end) {
+    int dist = std::distance(begin, end);
+    return begin + (rand() % dist);
   }
 };
 
@@ -44,12 +55,40 @@ void quick_sort(T begin, T end) {
   quick_sort<I>(left, end);
 }
 
-int main() {
-  vector<int> v = {4, 1, 3, 35, 324, 2, -1};
-  quick_sort<firstElement>(v.begin(), v.end());
+template <class T>
+void prettyPrint(vector<T> &v) {
+  std::cout << '{';
+  for (int i = 0; i < v.size() - 1; ++i) {
+    std::cout << v[i] << ", ";
+  }
+  std::cout << v.back();
+  std::cout << "}\n";
+}
 
-  printf("{ ");
-  for (const auto num : v) printf("%d, ", num);
-  printf("}\n");
+vector<int> randVec(const int max_size, const int max_val) {
+  vector<int> res(max_size);
+  auto gen = [max_val]() {return rand() % max_val;};
+  std::generate(res.begin(), res.end(), gen);
+  return std::move(res);
+}
+
+int main() {
+  srand(time(NULL));
+
+  const int MAX_SIZE = 30;
+  const int MAX_VAL = 200;
+
+  auto v = randVec(MAX_SIZE, MAX_VAL);
+  
+  std::cout << "Before: ";
+  prettyPrint(v);
+
+  // the template parameter determines which pivot selection is used
+  // You could also call quick_sort<Random>(...)
+  quick_sort<First>(v.begin(), v.end());
+
+  std::cout << "After: ";
+  prettyPrint(v);
+
   return 0;
 }
