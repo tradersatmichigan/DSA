@@ -287,7 +287,7 @@ void timed_test() {
     assert(tree.contains(0));
     auto c_end = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Search " << i << ": " << c_end - c_start << "\n";
+    std::cout << "Search " << i << ": " << (c_end - c_start).count() << "\n";
   }
 }
 
