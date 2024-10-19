@@ -3,61 +3,40 @@
 #include <vector>
 using std::vector;
 
-/*
-* Return the next power of 2 that is at least as great as the input
-*/
-int next_power2(int size) {
-  int power = 1;
-  while (power < size)
-    power <<= 1;
-  return power;
-}
-
 class segment_tree {
   vector<int> tree;
-  const int width;
-
-  static int leftChild(int node) { return 2 * node; }
-  static int rightChild(int node) { return 2 * node + 1; }
-  static int parentNode(int node) { return node / 2; }
-
-  int _query(int root, int start, int end, int queryStart, int queryEnd) const {
-    if (start > queryEnd || end < queryStart)
-      return 0;
-    else if (start >= queryStart && end <= queryEnd)
-      return tree[root];
-    int elementsPerChild = (end - start) / 2;
-    return _query(leftChild(root), start, start + elementsPerChild, queryStart,
-                  queryEnd) +
-           _query(rightChild(root), end - elementsPerChild, end, queryStart,
-                  queryEnd);
-  }
+  const int N;
 
  public:
-  segment_tree(vector<int>& data) : width(next_power2(data.size())) {
-    int size = 2 * width;
-    tree.resize(size);
+  segment_tree(const vector<int>& data) : N(data.size()) {
+    tree.resize(N << 1);
 
     // load in the base data
-    auto treePtr = tree.begin() + width;
-    for (auto dataPtr = data.begin(); dataPtr != data.end();
-         ++dataPtr, ++treePtr) {
-      *treePtr = *dataPtr;
+    for (size_t i = 0; i < N; ++i) {
+      tree[N + i] = data[i];
     }
-    // consolidate the numbers into sums
-    for (int node = width; node > 0; --node) {
-      tree[node] = tree[leftChild(node)] + tree[rightChild(node)];
+
+    // Build tree
+    for (size_t i = N - 1; i > 0; --i) {
+      tree[i] = tree[i << 1] + tree[(i << 1) + 1];
     }
   }
 
-  int query(int l, int r) { return _query(1, 0, width, l, r); }
+  int query(int l, int r) const {
+    int res = 0;
+    for (l += N, r += N; l < r; l >>= 1, r >>= 1) {
+      if (l % 2) res += tree[l++];
+      if (r % 2) res += tree[--r];
+    }
+    return res;
+  }
 
   void update_elt(int index, int newValue) {
-    index += width;
+    index += N;
     int delta = newValue - tree[index];
     while (index > 0) {
       tree[index] += delta;
-      index = parentNode(index);
+      index >>= 1;
     }
   }
 };
