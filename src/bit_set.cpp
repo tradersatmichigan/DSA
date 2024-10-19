@@ -19,10 +19,10 @@ class bit_set {
   T set[size / bitSize(T) + (bool)(size % bitSize(T))];
 
  public:
-  void add(UI key) {
+  void flip(UI key) {
     UI index = key / bitSize(T);
     UI offset = key % bitSize(T);
-    set[index] |= ((T)1 << offset);
+    set[index] ^= ((T)1 << offset);
   }
 
   bool contains(UI key) {
@@ -37,10 +37,12 @@ int main() {
 
   assert(!bs.contains(3));
 
-  bs.add(3);
+  bs.flip(3);
   assert(bs.contains(3));
   assert(!bs.contains(4));
 
-  bs.add(977);
+  bs.flip(977);
   assert(bs.contains(977));
+  bs.flip(977);
+  assert(!bs.contains(977));
 }
