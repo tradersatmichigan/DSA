@@ -1,3 +1,4 @@
+#include <random>
 #include <vector>
 
 template<class K, class V>
@@ -33,16 +34,23 @@ public:
 
   V get(K key) {
     auto i = find(key);
+    assert(!tree[i].empty);
+
     return tree[i].val;
   }
 };
 
 int main() {
-  const int MAX = 20;
+  const int MAX = 1000;
   Map<int, int> mp;
+  std::vector<int> nums;
   for (int i = 0; i < MAX; ++i) {
-    mp.insert(i, i * i);
+    nums.push_back(i);
   }
+
+  std::shuffle(nums.begin(), nums.end(), std::default_random_engine(0));
+
+  for (const auto num : nums) mp.insert(num, num * num);
 
   for (int i = 0; i < MAX; ++i) {
     if (mp.get(i) != i*i) {
